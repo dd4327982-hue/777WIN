@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Gaming Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #f8fafc;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: 900;
+            font-size: 16px;
+            border: 2px solid #fff;
+        }
+
+        .wallet-box {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 4px 10px;
+        }
+
+        .wallet-title {
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .wallet-balance {
+            font-size: 13px;
+            font-weight: 800;
+            color: #4ade80;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-deposit {
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+            color: #fff;
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #000;
+        }
+
+        .notice-banner {
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            font-size: 12px;
+            color: #fbbf24;
+            display: flex;
+            gap: 8px;
+            overflow: hidden;
+        }
+
+        .categories-container {
+            padding: 15px 16px 10px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .category-tab {
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .category-tab.active {
+            background: rgba(251, 191, 36, 0.25);
+            border-color: #fbbf24;
+            color: #fbbf24;
+        }
+
+        .games-section { padding: 12px 16px; }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 15px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .game-thumb {
+    height: 140px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border-radius: 8px;
+}
+
+.game-thumb img {
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    transform: none !important;
+    box-sizing: border-box;
+}
+  
+.game-thumb .badge-container {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 2;
+}
+        .badge {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            height: fit-content;
+        }
+
+        .multiplier {
+            background: rgba(34, 197, 94, 0.3);
+            border: 1px solid #4ade80;
+            color: #4ade80;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            height: fit-content;
+        }
+
+        .game-info {
+            padding: 10px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .game-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .btn-play {
+            width: 100%;
+            padding: 8px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+      /* Premium Background & Glowing Theme */
+body {
+    background: #0a0b0d !important;
+    background-image: 
+        radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        linear-gradient(180deg, #0f1015 0%, #070709 100%) !important;
+    background-attachment: fixed !important;
+    color: #ffffff;
+}
+
+/* Category Tabs Golden Glow */
+.category-tab {
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    transition: all 0.3s ease;
+}
+
+.category-tab.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(255, 215, 0, 0.1) 100%) !important;
+    border: 1px solid #d4af37 !important;
+    color: #fff7d6 !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
+}
+
+/* Golden Buttons Style */
+.btn-action, .btn-play {
+    background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Game Card VIP Border */
+.game-card {
+    border: 1px solid rgba(212, 175, 55, 0.25) !important;
+    background: rgba(20, 22, 31, 0.8) !important;
+    backdrop-filter: blur(8px);
+}
+/* User Profile Modal Styling */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #12141d;
+    border: 1px solid #d4af37;
+    width: 90%;
+    max-width: 420px;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+    color: #fff;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px; right: 15px;
+    font-size: 22px; cursor: pointer;
+    color: #d4af37;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    font-size: 40px;
+    background: rgba(212, 175, 55, 0.15);
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+    border: 2px solid #d4af37;
+}
+
+.uid-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-block;
+    color: #fcf6ba;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.history-tabs {
+    display: flex; gap: 8px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 10px;
+}
+
+.h-tab {
+    flex: 1; padding: 8px 4px;
+    font-size: 12px; text-align: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.h-tab.active {
+    background: linear-gradient(135deg, #bf953f 0%, #b38728 100%);
+    color: #000; font-weight: bold;
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 13px;
+}
+
+.history-item {
+    display: flex; justify-content: space-between;
+    padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-success { color: #4CAF50; }
+.status-fail { color: #F44336; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+}
+      </style>
+</head>
+ <body>
+
+    <header>
+        <div class="user-profile">
+            <div class="avatar" onclick="openProfile()" style="cursor: pointer;">😎</div>
+            <div class="wallet-box">
+                <div class="wallet-title">Balance</div>
+                <div class="wallet-balance">₹ 0.00</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-action btn-deposit" onclick="openDeposit()">Deposit</button>
+            <button class="btn-action btn-withdraw">Withdraw</button>
+        </div>
+    </header>
+
+    <div class="notice-banner">
+
+
+        📢 Welcome to Royal VIP Gaming Portal!
+    </div>
+    <div class="categories-container">
+    <div class="category-tab active" onclick="renderGames('hot')">🔥 Hot Games</div>
+    <div class="category-tab" onclick="renderGames('originals')">👑 Originals</div>
+    <div class="category-tab" onclick="renderGames('slots')">🎰 Slots</div>
+    <div class="category-tab" onclick="renderGames('cards')">🃏 Cards</div>
+    <div class="category-tab" onclick="renderGames('live casino')">🎲 Live Casino</div>
+<div class="category-tab" onclick="renderGames('fishing')">🎣 Fishing</div>
+    </div>
+    <div class="games-section">
+        <div class="section-title" id="catTitle">HOT GAMES</div>
+        <div class="games-grid" id="gamesGrid"></div>
+    </div>
+<!-- User Profile Modal -->
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeProfile()">&times;</span>
+        
+        <div class="profile-header">
+            <div class="profile-avatar">😎</div>
+            <h3 style="margin: 5px 0;">VIP Member</h3>
+            <div class="uid-box">UID: <span id="userUID">84920412</span></div>
+        </div>
+
+        <div class="history-tabs">
+            <div class="h-tab active" onclick="switchHistory('bets')">Game Bets</div>
+            <div class="h-tab" onclick="switchHistory('deposit')">Deposit</div>
+            <div class="h-tab" onclick="switchHistory('withdraw')">Withdraw</div>
+        </div>
+
+        <div id="historyContent" class="history-list">
+            <!-- Dynamic Data Render Hoga -->
+        </div>
+    </div>
+</div>
+
+      <script>
+        const games = [
+                    { 
+            name: "Aviator Crash", 
+            cat: "hot", 
+            badge: "HOT", 
+            mult: "100x", 
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCd-RIGF0DrBYAkP8NNMsg2wcXw9i8pEEmqXwAuselEg&s=10",
+            file: "Aviator.html"
+        },
+            { 
+                name: "Mines", 
+                cat: "slots", 
+                badge: "Slots", 
+                mult: "50x", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMJRCQE5LOzBq36Xfnq7_t0vq3suifItjXQxwBcB_zIewM6ZjciIgMhl3J&s=10",
+                file: "Mines.html"
+            },
+            { 
+                name: "wingo", 
+                cat: "hot", 
+                badge: "hot", 
+                mult: "2x", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnf18nGgN_Gly6FoH7HCOnhX8_O8WbbtVHCFafW8oV_A&s=10",
+                file: "wingo.html"
+            },
+            { 
+                name: "Wheel of Fortune", 
+                cat: "live casino", 
+                badge: "live casino", 
+                mult: "36x", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTv-gLGO9fD_3SS3aD5cYJYmd1QfQ24LF1wKGMvr-1GxHTEeA_tH6OmIs&s=10",
+                file: "wheel.html"
+            },
+          {
+          name: "chicken Road",
+          cat: "hot",
+            badge:"Hot",
+            mult: "10x",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThm3mSV9mlcgNLhgdjO00G9YyQ1ZBGlzwAN3-lvLUbmw&s=10",
+            file: "chicken.html"
+          },
+          {
+          name: "chicken Road 2",
+          cat: "hot",
+            badge:"Hot",
+            mult: "10x",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ4OV3R-nXrLdYoDri37quiQc1h_M17UmImtxqWx9PvA&s=10",
+            file: "chicken2.html"
+          },
+          {
+            name: "plinko",
+          cat: "originals",
+           badge: "ORIGINALS",
+           mult: "13x",
+           img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4a4GaS64wEEzctj_LgTYpx3Ge_4-M6Gq6U4Nef3wt8Q&s",
+           file: "plinko.html",
+          },
+          {
+            name: "Vortex",
+            cat: "originals",
+            badge: "ORIGINALS",
+            mult: "5x",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6mZTDl--QIzu9XMJeoqkzDNThKr_1jTp48ZD2Ui3x6o9Ioa2eHED4km4&s=10",
+            file: "Vortex.html",
+           },
+          {
+          name: "Mines pro",
+           cat: "slots",
+          badge: "Slots",
+          mult: "15x",
+          img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRX1bCND98jcSqorq2FcsQmfxVw4Mw-F7wwg3NqDDL7Yw&s=10",
+          file: "Mines pro.html",
+          },
+          {
+          name:"Dragon gems clash",
+          cat: "slots",
+          badge: "Slots",
+          mult: "25x",
+          img: "https://www.yellowbat.com/wp-content/uploads/2025/11/Yellow-Bat-Dragon-Gems-Clash-Lobby-icon.webp",
+          file: "Dragon.html",
+          },
+            {
+            name: "Rocket",
+            cat: "originals",
+            badge: "originals",
+            mult: "40x",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_3uCGWwRFJerP3b35QD7zUcdc_wpvxBbs8HXqo1UBwg&s=10",
+            file: "Rocket.html",
+            },
+          {
+          name:"TRX wingo",
+          cat:"hot",
+          badge: "HOT",
+          mult: "55x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgsOLhNZitDdEP_AQbN5mpmiV8cljTQzAdZ1wOPXvi-Q&s=10",
+           file: "TRX.html",
+          },
+          {
+          name:"money coming",
+          cat: "slots",
+          badge:"Slots",
+          mult: "22x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh6Oji9SPE0AqvHdKXaTIgEM1KyT8zABGt_a6LTj0eCA&s=10",
+          file:"money coming.html",
+          },
+          {
+          name:"Fortune of Gems",
+          cat: "slots",
+          badge:"Slots",
+          mult: "30x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyFNKaaQ2TN42FZIQaavox6aauNHTqoBuiG15gJn7lfg&s=10",
+          file:"Fortune.html",
+            },
+          {
+          name:"Fortune Garuda 500",
+          cat: "slots",
+          badge:"Slots",
+          mult: "35x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeQa7i7wsnLmURNmLF_94IZE-LFhrQTEGmsBxUMBHItw&s=10",
+          file:"Fortune Garuda.html",
+            },
+          { 
+          name:"k3",
+          cat: "hot",
+          badge: "Hot",
+          mult: "70x",
+          img: "data:image/jpeg;base64,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",
+          file: "k3.html",
+          },
+          { 
+          name:"royal fishing",
+          cat: "Fishing",
+          badge: "fishing",
+          mult: "48x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2k0gLCiHriwiwF2LhEP2GmtY9DIcQSDEyh81YT9PaOA&s=10",
+          file: "royal fishing.html",
+          },
+{ 
+          name:"bombing fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "52x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSItHboYnXHMnRtPJ-jG3nGzasPfhfTkDKMV7aUkVVQWw&s=10",
+          file: "bombing fishing.html",
+          },
+{ 
+          name:"dinasaur tycoon 2",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "34x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFYUYAo7LmFXbbESTLcCr8WIBWPjf5P0RwYb6yYxY9Kw&s=10",
+          file: "dinasaur tycoon 2.html",
+          },
+{ 
+          name:"dinasaur tycoon",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "30x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMxEwZszHjjRueecew_w7On-E4rQzWfsJTTRivTLNnFg&s=10",
+          file: "dinasaur tycoon.html",
+          },
+{ 
+          name:"fortune of Zombie",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "40x",
+          img: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAM4BBAMBIgACEQEDEQH/xAAcAAACAgMBAQAAAAAAAAAAAAAFBgMEAQIHAAj/xABCEAACAQMCBAQDBgUDAgUEAwABAgMABBEFEgYhMUETUWFxIjKRBxQjgaGxFUJSwdFi4fAzchYkU4LxNGOSogglQ//EABoBAAMBAQEBAAAAAAAAAAAAAAIDBAUBAAb/xAAoEQACAgEEAgICAgMBAAAAAAABAgADEQQSITETQQUiMlEjYRRC8YH/2gAMAwEAAhEDEQA/AOTJitpD8Oa0FMeh8JXetWwnM4toz8pKFy59APWlu6oMtKQMxZrwpt1L7P8AVbWMvZvHd4GWRQVcD0VsZ/LNKbKUZlYHcCQVOQQR6VxLUccGcIIj3wBqrndaPKyPCoaN+23cOvr8R5/4ro5nWVAyBpAeqAZJrg9jdzWk4liPzDBB7g9qeuHeMkRljmzF/wBxyrH37ft6ioNRQd25ZfTYNmG7hLUOF9W1S8jlMP3S3dsYklGQv9QUH9K6doC2Gk2Mdpb4SNABz+YnuW9aWF1eKSNhPIN6n4QMcx5/Sh5n1i8fZZ/d4UY48WWXOPyxnpz9hUxXiJsO5sN1OnC5gkGNyEeWRQDU9baxvWS3svGj2g7g4Az7UEg0HXCuE1FJ1AwHXKnP9zVNLLiewcLLbNdQ9yxyR+uf3qBt+eY6vT1d7pavru/1qZDPEtvFGcgA9D71egRVfCnl51OlpiDxJ/EjA/kIx9M1BbgGTAIVegHpU7nJyY8EAYWGbY/BQXiu/wBPS18CWR/H3bxsPONSMAHI78+XWjdmiSZWOWNmHUB84rlP2gW+oWWq3DQbpmdg6d8Fjge5GB9av+NVSxLTMuBySO5a1LXYoVjinmaWTlttlkz1/q/35c+9UoNa1e6eUJDDBFGyh5BGZAmehJ6AHoOfWmHhThbTNKttK1TXbxI7v42mhuSvOTmO56qOWOYzzo1ZcR8D6ZZ3kX8Qt4be4lk3qwYhsjBxy6eQra3H/WAKaVGWGTFO01jXI5GRtSgARACj2oI3Y+XPLB7efvU6cUTIhOqwIsZOFmgO5T58jzx9aZ7XVODf/C8ljZarYCBoMkvMockjqQee7P7VU4j4OsI+Go4rOEXd+WTw5iwDSMTg8+gGMnA5DFcDuO4wpprBjGINe7F6I7mymXd3mjO7f6MO/wC9U5b61WVbfWbQQeIOVxBKQrn2zy9uVUdZ4S1fSdStYtJuHuLiWFmcW8W1FK4HxEtjBz1JB/QUpJrl5d3MVpfxxhZmCn/S2cAkE8uf1qhXVu5HZpHr5Q8R+gtdPtdzWoYhzzYnqKBcTRqtizxc13Z9cf8ADVA6hc2B8FmLRjmpJ5j0qpd307WcjzMdjclBNKux1NX4ivfkn1Gb7MUhnvbq5LgTJDsC47E8/wBqcrpN79O9Jn2X2sq3V1fnlD4Wz/uYn/A/WnS4dfGXn/NWBqG/mxLrsC04jrYrizjX/TQnivU00nTmIx48oKxr15+f/PSjNgR91jORjb1rm/Fl61/qzkk7I/gj59vP8zVlihK8+5l6es2WkehEiXTzNcvdXJyey+dV7sO6+GvI5zy8qO3C/BQwj/zK/n+xoEYkczXYcS3w+/3Y7OnLtXtXfeWOedDYLlo7za2QvnVy7O9KFl+2YsdRPvfnloWaNapFtd9tB2Xb1rUoP1mdcPtI69Xq9T5PiZWuncD6jDJpyQswURAA5Pyn1rmUdWEuZrUmS3cxlhggHqKDVU+VcQkOJ9HWMXiIofayE5GOYBrmf2zaLZWU1jqVsES4utyTqOrkcw59TnB/Klnh/jO70SORF8VsodmJiFQ+e3oTQ7iDX7ziG8jnvHJMcexVznA/Puf8VDptLbXdz1Ds27eIOQVMnLpyrRF+Cpttak4B7hLTtQmjjd52lmtrcD4M8wCwHI+Qyab2ubiJY2sg7Wu0Msipksp54JAz18x+dJOlMqXhRwDFMhiYH1HL9cH8q0i1W70uQwQPhFP/AE25r+VSXVgtxG7dwyZ1Gw41ezAiuIGjGcDn0/Lr+lF149QvhX3kkYwpwOf/AM1yuDiWG4TF5Yqyk5LK39j/AJr11rWn/wAkcgbyDjH71MaMwSir1OvXfEDagwhhX8MEbmP6j3/yKibLR7Qe4+lI/Ak097Nd3MQMdkoVAp5/EMnPvzNPUI86zdVUqttllQCpmR/eWhG5M7h0I60N1y/nuI0Z1VghyrKdpHfd7/pV7XjDYaXPdYldi+yKKIZZm5sceygk0jC+ueIkmg0yGZGkDL4tyPDhXAyfiBPM9B70rSaS8OGHUOy6hlO+KPEWuaprOtSsZ5WcuURQNvM9RyJHXPeh8+i6qIwZInZF+X4xgflmui6VwRZ6fcRXUuqxtMbHc0bA/BcHBAzj5cZ500WPDGmXkcO6/kRnhJm+H4VflyB6eY8+VfSMzL+IkCmhh/I04QNJvm6W8n/40RS64i06GALeX0UVvJ4kAEjbEcdCBnArsMnCn/0cNpdWUks+Q5LsBGAN24DmWOBjHLt060pcScO8T2UupS26+Np1oQBOF2eLnHJVzkkZ/Tr2rwsY9iH4tL6Yyvof2q6pbyagdYQXEk8IWEqoUIy56jyOedWtYOl63PoraNHHDDFIBJFsAeVtu6RiQeeAoGT3NIOswbJCr27wXEZ/FidChT0wehpq+z6xlS0n1B1JM2Ybbd2Uc3Pt0H1owgPIkdzeIEZlzVIfEn3MOW6po7OwlgP8Vbw4d3wurAbcZ6DzP+am1CPnn+UdTVa4iSdrfTZrGZ55sOkrcvCTPMj1z6e9T3ElppfHHZp+Id4f17SbBPutjBcx2rNyeZc7ieXnkUzXaqVJQ8+qmlqxtd5CTPHPOFWPxMf9QgklvYDv3pjn+HCLzCrjNZOoC7sjuUsAWBjHFqyW2hGWUjK8lUd6QbmXx5GlJxu7eVWbmWWRVj37kXt0BqjMpiJLEchnae/vXWc2ARlFC0kn9zXw99D7m1KTq1X45GUZbKnyIqvczF5guPhXvXAWDcwmIJ4i/qAZWJU8k5scfNzqxbXAmTzqW+z9znG0Z659POhOny7G25qpfsklbgzOpRelAriL0o/qtxFDtRm3SMRy9DQe5FPpJHBiLQDzBeK9W7j4qzVu4STbI1rLmpVt5P6Kw8Ev/pt9KqCH9RAtT0ZXxWyqD1FSLA5ONjFvIZorpPD2panPHFb253P5jABpVhC/lGIu7qUY1qYrT/L9m1xFFhC7v3I86XtS4Y1CxLbo2dfMDFKW1W6lC4gBW2yq6nGzuK31qHfcCVRhZBvUDtmvSQvG210K+9WLncbKBiMjGzP1NBdxgiMXrEEKAo2kCo9pmmjiRcsxAx7mpp0IO4VY4eTfq9tv285lXJ6dRXN31zOEDOJ1jh6xTS9PgtEBygwx7E+dH4jVC3GRtBojBH/qFYFpJYkypuF4gnX7tjdRC2naGS0j/DC4G1mzuP64pTv11Zx/9S08WQAHOGB/53pj4osJklW7tzgqMSYHXv8A5odbTRsTFMqiYctrDka3NJYrIBMHUJYrEjowba6bNcp8asMVZXTJbd8pNNG3lkj9qNwXEafzCr17fWk9v4aoOlXYkRYnuLrTajBh/vbNt6F8MR+fWvWnFN7YPG0yM6ROZgFfI3Hz+uetSXJiYMAapPDCerZrmwGEthmmsXmncQxrDcWUrz+JvEkKBGkdj1YjrnAXvRhYVtrVAY0hwm0RJyWJR2GPLJGe5JNUoJorT8VCDKer+XtUU18h6tnt1ru0AcRoLWHBlTXrsW1mXj2k7lJB7jNFtNWXXoFuIreXw5uZkJwgx3I7+w60Hg0W54luIki2raxSEytnv279/wBK6fHHHa20UFsgjjRdioo5KPQVjay8IcDufQLaEQKso2Fjb2NsyRINzfNIRzY1HOuOlXmXd0qeGwjDD70xJU/iKByX0JrNrre5sjuC161csYDtVsd+/UbgJGOap038j37CrestHZ2yTfeEVf6QQMjyGPL9c0cv7y0jlS0gjhf4SWBHwjpXPuN+GpL+S3XTZPAhJKTIGbaPUKM+vIelVV2rVd4X7nRb5F3+oFl4mt7tvBViZDkDlk498VNbMZY97E885rCaPpWkQDxIfEf/ANaXm2f7CtRcQRxl1XdA3Lk3OrrqQ0CjVqW4ExKTLaXrbei4Hpil62/6y0y2wWTTr5geWz/NLlsFEgLHCqOtIrHYlD/lN57BfvJuJTuIX4R5ULvHQfNyqxq2tRx5WHGT1xS3JcTXL/Gc+1VV1scEyaxlHAlgzx5716oPCNeqjAicidPt+HtQl+IxyBfN1WMf5ohBwrH8JubiEN5KWP8AiqC6tdSnfczYXuoxmsSazMfwrYlR/WeZpw1h/cop+HVOxD6aNpVoN2WaTz2gf5qzDeW9qFFvhR/p5UrFL+W3M58Rx2zkCqyaiIhhzk+lZurV7RmbGn01CjaOZ0/TtdVgqtyo2YLTUo9skan3FcmttcjU5OBTZonEkL3EcBYeL1bLcgO9ZY8tZk2s0IUblkXE/AEU8bPboM+YpD1nQJ9O0fbMhJWTcPQDIrvEGoWkgwZFI8jQ7iDRLTVbRli25ZeYHetBbWZQDMhLCrcz5qnQFcE4HfzqurlHV1JBiOQD/L/vTNxNoTaXqDF1OwthR/T6etLW3fIxPy43EnuSOX/PSq05GI5u8zoHDvGyPbn+MXLPKgSOGNULPIeeT050+WssbgMpz5gdu9cCiJt2MwkZCD8G04PvV601+7sbkXNnOIsOHMSqdrY7n/586RboUfleDF+c5wZ9AGJZU2blffgFQeYz39v8VzHV9a0W5vZra2uPxYnKxSjlvOccj0xkdPUY64C3rHHGsX93cXEMn3MXEKxskJwCAP8Ac0pSh1w3ht8S9e1FptEa+SYp7AePUen1C5RvhlJI6AjkaiOt3aeVL2gG7vLxLdZn8I83Oc4HpnpV3VFksriRHKuinHIcwcZwfXFUkuDjMOmilxlhLr61en5dv51hdUvB820n+o9PpVnhjhXUOKJ0itSIY2G4yyjkFB6/rXTtP+yHQLW2xetc3s+OcpcoFPoo/uTXhY09bVp14AnKP4lcZ2kjI75xjtTNovCWsamVebdDbMAdzHBI9KocaWFlbXEunaTKjwI2JWjjAIPXby64PemHhjjqHTtIhtNSWSR4AI0KjO7yHvQ2mwplIgKoPEetL0y20qyS1tEIRBzLcyT51vKKzZ3sd7DHLbrJtkG4b4yrY9qzN8Hz5/MEV8+6Wu2WHMoUEdyqJYoC0srjIOUjI6+/oOv0pM1fiDUpNQFpor+NO5BdOR257kgnHP8Aej2vETAXVtKGMfwyKrc9vny+tVtP02NJG1CK48GQqVdTz8X3J8vTpz65rR0420/T8pNYFNwFn4mXdFtnt4mkvLgS3UnOSRuSj0HkK9rmqDTkWOO1ubiZicmCPcFGDzPl5Ad6R3v9R1lmRAIyJCVZ5FZo25D5R9eY+tEXn1eIx2FvN4926F3YuPhHLJJ6jy9qzBp7BcHblpsOtXi7+sXtcste1WdRBp81vGc7jOQn1yeX/OVetOGNShj3TywFu6rIfh/QU36hxbbX8IzEEwSGjHM5pfOuy3EjeFGEGdpbPMewrdD5GDMgbw316li3glgtNRieMofByvl3pXK8sdqaNPufGivmnckeCVXNLzJ6VPXw5mouWUEwDd6Zvk3dqiis405cwfOjc4XzaqDL8bVWrkiJdADmD8H+ms1JXqbmTYhZ7uSZB8e2P5V2jq3+KfuEdNtBbrdX7bI1UHae/v6UgaYovdRXIHgRdE9Owo7ea6WnWGNvw42+Ig/MfOjr0w7gaj5F3fxr/wAnTLuSy1GMQRbI4F+UAAUn6twoAPEtjgelC4tbcv8AC2PY0asOITnY7cvLNR6kPXzLNMxHIMTL+zubR8OCV8xVWG4lgk3Ruyf9pxXRL62t7+Hciru8qR9VsGtZOXy0qh0s4buWvbYy4zLEXE2ox/LK5/8AeaaNM4tv18LLt8tICpTFYR/9D/s/vTra1UcRVaB+xM8V3Wpa7MsaWzgH5gAOdBrfhPVdn4UA67gWdeXsKeLWLtjnRWFAWQEdKj87L1GNQs5DrGhajYlnvbKVEIyWxkY9xyqlb6PN93S4jzuPRT3rqXF+ri1hFlEVXxB+IzD5Vz0FJixatPGW03T7p4W6SLCzE/mKpq1Dkcw00NJy9sWDE3jrA0bKzHGD/KaJylBtjaMGJV5gjoO361rOl0JCZQ4dTkiTqv5HpWPvBdlEuF+Pcx67gOgqjeW9yN9GKydnRnUODOB9Oh4bi1i5MrTzIZDGPhTBJ2gkjkOQyaVNQ0uwl1aK30g/f5pVVd8h2IZCxGQMDI5/QGtp+Lby50mw0lTttLRfjIblKe2707Y9Kh0jWBYakL6zto2ZFPhuRkB8Y3Ad8DIA7Z/KlFjmVUadaKmtc8+hOpWug2/CWi2Up1BhLaSeMN8hVJCRhlVOnQnGBnpQfi77Q3vEksNA3wpnD3ZJDEeSAcx79fSkjUNQutSc3eo3M00pO1dz/p/sKoMQvy0+sZmQ/eT3LV6FH4URAIj5swwSf0ql4DROHll3FegUY+vOswNbG7G9UacDeTgZK+Z9fSpprwfHz6dPWnAQVODLUGpapbhlju5I4y5aRlkOcdgT19h7UPn1G8uXZJZ5nwMqXc59zUaOG2rJJshXqB1b64x+fKtbmV2x93tgVI5NI20EemcE/QCl+MZzKGvJGMQxwM002vSWYmIWe3dW3c8nHX+350xz3VzpDeBqOYx/KwyVceeaCfZtcxScSCO8t/BuxAyIV6H39fWmbi+7mvVayEaC23NGJCpLM6gZxzGMbl8+p8qjdit2AO4ixVZMmLiwWGqa81zDNNbhk+aF9u4+/X9KaoLTSLC2zDAm8YzJ1Y46cyc0pyW4itAYCUkjxn4uee/5c/2qvDeXM0kccs5Te4j6nmT0FMcDuSIrWHbmEL+3sPvbSR3HhO/xeGByz6Ht+YqqYreaZUtYTGgGM4xn1NF4tJiTHiEvnmazJBs+QCpTYJtUaTAy0h0q1Ecd2o54hJoCyU06cnxXS/8A2WpedKVWcuZUy44EG3S+lU9m5+VX7r5ttVocq7ZUdKsXiTOMmCHHxV6t5V+M16qMyXEn0+cwWjuCQ7DbyNRBj5moFPLbUyiqvIVktdABJ/csQzMlW47ls5yc1SRatQJl+dTXPvHMurrx1GPSdWy21uVXNUiS6t9y4pZUGCdWBwPSmKxlE0eOo8qzCoR90qGejF0QlW2mmSyi/wCly/kqnJZH7z0pgtLXa6ZH8oqi2wFY6scy7bR/Dnv50RiiKpuKndUVvDRNTgb5GG3HXp2qFp6xsQTZcM29xeff9RAnmPNY3GUTl5d/f1ptij2rtUYXyHSlK84w06zmMCzx/AfiJ54PrzH75q3dca6bZWniSN4kpj3rHHzLdAB3xuPIftyNeNdh4Ehudm7MU/tpbwjp0ES5kO5t2Bzxy5+g5/pXJoEuJnyhZueN2eVM3HPEc2tai24kMVEYAPIL6enM0NgH3WACFtvL4iRn861qwa6wD3JwWLdy9Zw6faaSzXMvi3kjkBQuFRMDBz3PXkK3gRmICr4YxgNjnj0FVbe3mkQywlX5YJPX/Fb77mPkysF88UJ7jsnHJlmQRxSbwzNkYYsep9u1QzzFQUhIEp6seYQeeP7VBcz+BGeeWPJcd27VqqhFJByx5s39R709BxJG7mU2QAeHkl+bO3VvXNRvcHf1FazP61QmbayleZ8qbPAQ3auoIcv4YPtn/ai5hiu7UywK2VOT8RbdSxbSkgsLbeh6+FV60u7fxMxTPA4+XOaAmEVMYeGdRtdMvHvLmMPLBG5hORk5Bpv0pP8AxLwfHLFhr62uJHK5+YsTke2GBHqoFcuuD40m5eYHTaDzohw1xNd8OXrNAd8EgAliJ5HHQ1Kw/kyI01bkwZZ1G/SKZ0BZNrYdGBBB8v8AarHCbwy8SpFNEHdrfxLckEbOufqOYPYe9e17iuHUS062NpPcn5ZLiFHK+wxk+xozwFoF0Z5Na1Mtvn+RnX4nGOuOwx0H9sUNrhUOe5yina4zDksW3rVWRPSjE8PnVGWE1lTZDZlWwT8aX1hbNL80Xxtspq0+EG5fJx+GVoC8eHbHLnRIftON3F+6gfxN2KrKhL8+VGp4/U1QeP46tVpOycwLJEoY5r1WZoh4rc+9Yp+ZPsghF71bRa0iSrSR05mgqJ6NKv2ceX5ioIkojp8fx0h24llKZnr63Hh78GsademHpzovc25ezx3pT8b7tcMHOB5UgAPPagbWzGvSnkuZWmnOAWwiHyplieNZI1LLu5d65lJxKbflCuaKcDjVNd10TSb/ALrF8bk9PYUJobGTBS4DidSRUhiaWQgRIu5mPYdetIfGHFDzp9002crFn4pUyP8A2jv5ZP0756dBDy20p8dcGR3dpJqelx7LuIbpEUcpR7edLqC7uYq1+ZyZ2OwbyTjpmtZrvZ+M5BO3HP2xj8q1ctIyxRrlscwFJJ9qPaZ9nXEWsfiNaGztVGTJc5XI74GM/pWspQASNiSeYnW8bXExlcnl0z3ooshTPiDGeTds/WqcMe0bVYhwxAAPLANEpJY/HaJrdHCELncRz9/9qBzkxiAKJqty0cmApQ+R+E1O19O/wvKdvmRWs7xvHGFADHJZWOeXLmD9aoXoWNdiuGdvhXHQZ71xBzPMeJssiTyNKw+BfhUefmazLKqJ1qEDwxhWOBUEzBxtqiTjuZe43v8AACaKaFw1qetzotnbNIzcgwB2gUwfZtwTJxDeLLOhWzQgyNjt/wA5D8/KvoPTtNtNNtlt7GBI41XAA6n3NJdzCdwhwJypfskMegsYpsamG3I2eTADmp7f3rnd/Z3FlcPb3luUnjOCrDv/AMFfUmKWOLuEbHiC33MqxXaKdk4H6HzFTlmnqrsHmfPDY/Sq5iMsvwgYIz0/Sm2bgfiBb97NdOlkZTt3qvwHpz3fmK6NwZ9ntro6Ld6kiXF7nkvVYvbPegNhUZlb2IFipwNwC4VdQ1yHYnWO3YfEw828vb/h6C8AVQqqAAMAAdKOTQgrzqi8VQ2OXOTFq+YEliqlLDRueGqUsfpSjxLEeCoI2W5+EZY5wO1B5ofjblTRDHi5XHLOc/Q0EuYsO3ua8h5jQ2TF+5gI3bedUTAd9HriHb8S8xVJ4x5CqFczgGTF2eAeM/I9a9V64VvGfl3r1O3ReBF9I6sxxnfWVSrcaDbnAzTnedrrnoofSimmw+gqvGp2KNoz54ovpcXLOOflU1lnErRMS6lvmPBANCLnhJLyctuxupmiSr9vD6dKnS0r1OWqGHMVdO+z2xDqZzuHtT9p+l22nxrFZwrFGoBwoAycVm1h+WiiwkNkAY866dTk4YyByFmYYu9XYkqOIbulXI0pta55kdj8ynZaNplrM08FhbRTMcmRIVVifcCg32n6r/BuBdVnVikksfgRlTg7n+HP5Ak/lTWq1yb/APkRqIj0LTNNBwbi4Mp9kXH7vV1KbmGZKzEzhtrdtDOjtllU8wedERc20j71nZJCxYgjGDQpY/Sr1vbKbNwcZOcVaUBnVsYSxcXgYqXnMvw98efTlVZHDz7sdqhNqUXzreIVzbjmMVy3BlnNQnYo+Pmx5HHapMdu3nUTRgHIBz6+VCTG7Z3Xg/jbhrQ9BtrKDxWKoCX2Y8Ru/f8AL2xyo7B9p3D8zbXaeL/vQD+9fOsEm3btOO3KiHiHOXfcfU5pJnvCnZn0jo3Fuja3etZ6fdeJOqF9mOw/T9aO4rnP2O8Oy2djJrN2m2S6AWBWXBEXn6bj29K6TXdskfAOBI9oxWjDnnvU2K0YUiyv3OCVpE9KqyR0QYVXdaidcRytBskYHUA0o8QcS2WkZ8RS+TtA827gHzp3kjzXH+LeEOILnWJFiR7q1eQtE3ighAeowSMYoaVVn+/UoDEDiH9A4t0vVbtY2zazdo5j83brQnjqS/s1jNjnw2Y73VsY8hSRrWh6loMpS9gkVB0bqpo7wLr1zfai2l38pnhljJjD4JUjtk9sZqs6ZFJsTkCAtzs2xpT0XXporkxajKWgfkGc80IpkHhTjNu6SA9SrZApQ43sE0rWTb2rZiljEmP6ck8v0qlpd/dWFxbPGxYuflzyYE4wfrTbqEsG9eDCp1Do3jbqN17ABcNg16r91B+O3KsVnbppRUiA8qvQINnQfSqkaVft1pzmNqWTQpRfS1+NqoQpRjSI/mqR2zKTwITgionAlQQR0RhjpQMkdpvDPEJGiQjxEAyD2zU3ilht3FfY1VvNLa53tbExXJHwyDP60PtTrtrdLb6jYmVG6XERBHucf7VNbS5O4SYlD2Yw207Qp8zNjrvINHLc74lb+oChUWlllDSSMQeqgYoxEuyMADAHStHQI44bqZ17KeptXAPt/vRecV2diOaWdrkgf1Mc/sBX0Bivlrju8bU+ONZuC25UumjQ57Kdo/atupcGTCKyjacHpjr60Wslje1HP4lPMVRli2jBHU5PpWtu5hk6naf1qjM7L8kJPTlUUsPhLuUcq89+F/kP1qW1lNzykjVd3y8+Q/zQt1DU4MijKL8WN3kh6VpKXf58bm8ugFEJ7LbHutzntg+dCXeeOb8SI47qBSwCZR5RJFyuAAO3auofZj9ncmsPFq2vQvHYL8UVu4wZz5nyX96MfY9wjot/pkevXMf3q48RlRJOaRlcYOPP3rr2B5V0JEvcTwJhFVFCqAqjkAB0rNerNdxJ5itTW9akUuxeJ0SMiql5NFbQPPK+I0+Y1dYUo/abaXF1wdfC03eJGFlIB+ZQeY+lRMm7iMWKWu/afHb+NHZIrTL8KDqp9d3egOifapqCXf8A/bxJPa9GMSBXT27H2oBwVokXEfElvZXaSfdirNMVODtCnv74qxx7wTPwvdLLAzS2ErYSXHND/SaatVP4GG271OpcTC313hC8awkSeGWBnjZee7AyPzrhGj376XqtpeqMmGRW917j6cqL8K8Vahw6zrb4ltnGHtpPkPqPKgE3N2IXaCxOM/LTaKSm5fUFrM8w1xtqEOp8QTzWjiSBVVUZRy6D+9VtIKXOv6am3CeJEPpjP7ULzyx2q3pVyLXU7O4PywzKx9s0xqwteBO1tl8mdWvYmFw3KvUSuI4pJN+4kMMgr0IrFfPHOZseQRDjiG/oKuRxgdhVC01C1m5I/PzajNmvjYVFyx7560y7cgyZTXYjfiZvbRFht70Y0qMKzKQa8tj92t1nABbPPByKu2eH1QRKQPhBJHQ/8NRtZOtaMYhK3jq8gUY3HGenrXlh2dhUbK0ZDyAMsYOOuMHHMjt7586EWCQtYTCNu6o688UViKkYU5oAH+If1L2qWO9ayKlpCUb+oc/an1X8jdI7UyciMIxWwoRFrVux6OF8yKIW9zFMMxupHvWrTbWfcmatl7EkuZ0tbea4kP4cSF2/LnXyOniTSS3Dj45HLuT1JJzX0z9oNy9twZqzRnDPDsBB/qIX+9fOtzBIg/CYLy7itBSIABgy42jqCaqE8sdqvTrIfhOCaiispppo4kQGSRgqJ3JNFuhYkcPhN2SQeR61fieMjZzUjoG5Zrpmh/Y3AE3a/q6RNj/p2TDP5lh/aqfGX2bwaFBBcabfyXETEiVLjaXHLky7QBj/AG/IGsUDOYSqScCKNrukikiPYZGCBUMkTOMs67V6cv710fgLhW6dTNNY26WzrgtdDc7D/SP84/Oj2s8A293pUlrbyr95Vi8MzxgMv+ksOo96hHyCizbiNekL75g77B7xI49T0oyhgCs6L065DfstdbxXzbwZqcnD/FdnO+Y08bwbkk/yk4P05GvpFWBUEEHkDy51rZB6kbdzDEIMkgAdSaBX+veFK0VsuW/rcHFT8R3DwwxqpwrE55dSByFJlxcxwAyTyBEAyzMcAelfP/Ja61H8NUt0unD/AGMaNJ1ya5vfAudgXsVBHtTEaSeBpU1IS3cUEgtwQBLIuPEPPmvpTtVmhNhp/l7ib1CvgTQ1pLEkkbRyIrIwIKsMgg9Ripa1NG4xFCBtG4c0nQvEbSrOOAyn4nXmx9Mnt6VBxRpy39iYpk8S3IIkQjqCP3o6Tyz0960JGB28z2FT2qSMxitgz5U1ex/h2oSW2fEUE7ZF6MvY/Sh5OOldk+1fhzSH0ybUbBoob23O540bAdc8+Xn3rjFX0W70E86c5E2zWeVR5rOaoPMDqdh4M1a3vuH7f71MqSwZhO49QOh+hFerlNvfSwxhI2KjyBxWahOjQmP/AMhpZ03TzcMstxIIoSebseg70btNXFmS9rNvReSsx+X9KpcaOlrEtlHyy2CB12jpVLg7h284p1ZdOtWWPapklkcZCqMDP6ih2LankfqP3mn6rCMPGOoRXKLJMbmHdzR1G0ewApz0jWILqE3tjlZIPnjfng9vr0r3EH2X2+naSsun3TePbqXmaXmJV5cwf5cc+XP3rThPT9JtNHlSG7W6u59pk25G32HXHXnUOqNNlWUEKglTuJh+HiOVbNb2FBdW7cmVyA0fpn/NFLbXoLlWVbScnbyAAP051zi/sNb0y2lEDCWM5D7CCSp8x1/OivCXFFnHaIznw3XC3Eff3FQ2aUqu5RmaDV1MvAj7cLgM24pIFJ5HoR5+dKv8ca6vmhkZQsathB28/wC1e1Pip5V8O2RIM88SDMhz3I6KPeh2mgF95xvLZDbBmpym0EvOUUcZaMiuZEHXB6A881YsYblHLWrsoH9RwD+dC9S0+S80wMpI2sCvPBK98UxWe1LSCNcgAcs9aULCq5EGwKF+sC8ZTakdBuobiYSwvtyMDlhgewrmE8JKfDzrpvGEkK6TKm0GeRgFCrknnzA9aW9L4Uup4zLqDtbxA58KMZfHqef6ZrV0usK1brDIzWM8CIEtuyy7TjNEeGrLxNUWRgXSPny9OlNfE3DNnbWEclmkiSuSd8hyenT2qpwxAYbNnnUK7SHljmMAU+zWh6CyQk0xD8wiVLH45G/Smvhm1We1/EVTGrZ5jOTSpHeW8pIQM4HU4xim3h7U7GOP7obmJLn5wjNjkTWUd54IldykLkCNUIAHIAVT1nVINMsbi+mIK26kjn8znov5k/tVfVtWg060+8XE2I+gjtxud/TPb3rlfEnEcutzKhXwbONvwbVP5T5nzY+dU6erf9j1M0qSYDeCS78SV8iR2Lk+tdi4I4pJ0C1guVeSeAeE23qcVzmztt8ZEilSvIgjHPrgg/lU2kXKWF/IvXJyF3AZb8yK0btVYqfx9xx0ykczspvI71FjuLZ1WTlluxqinB+lMQ1ystyFbcqzvuC/l/mhdrf306RM8UaRA5wrbj+ecfp9aYbbUotwR359QO/v/wAzSdNrqbHxcPtJ3resfSE4oooIlSJFjRRgKBgAVVudVtLc4aQE+SnnQrVdWaYtDbN8KnDMD19qAPH4rbpt2D1B7flS9Z80EbbSJynTbuXMaxr9oX2ncv8AqOMfvRGOVJEDRkMp75pC+GPoAPYVtaajMuYoJOQGUVmIHqKmo+XsJ/kGY19Iv+sTftH1XUdP48uHt7q4iKJH4Wx8BRtGcDp1zV9+PrrU9LjSaVbeYDbJsfb4h8/QVNxdpy63ayTTrtuoxhJN4beOw65/SuYHQtXkkf8A8lIccixxgfnmtOu2nVVnJxBWlqznGYZ4h1pXtHtYZUdpOTFASAvv1P0pNNGzwzqpzvhUZ85QP715OFNVk/lhX3lB/bNVUvp6lwGnHrtsOSIBIrNNFhwReXUn491CiAFiEBJOO3QfvVbVuGZ7G38WNg+Bl4/5kGBzP/P800ayktgNAOncDqAa9WN1eqjdEYk+v6idU1OW6/kJwg/0iumfZMsPD+jXutXQjVZxymkHJY1znHuT+lckUURl1O8m06PT3uH+6QnKRA8snv60i+jfWK14EoDqeWjbx5x/d8Sn7pagw6YrEhAcNMf6m9PT60oW1xJEVkgLoRy3Lnl9Ks8OaJc6/qsVnbNt7ySNzCLnm1d14W0qx0hW0+2tVWFlwZXwXmPfd/io79RTpcJPJSWBM4ZDrN/DIJIbibI6EkmuhcK8LJxVFFq0r/c1PKQRjO9wTzHYD60H4l+z7VodWkOmWpns5ZPwmDLlc9jkj2rr3DGkjQdBs7DaGeNfxSCObHr1x3qfWamsVgoeTGgmvoxSveAmt0d9Pvmlk6iOdcFvY/7Uv6bqK2mpva39u1uYjhlmOCK6+ZIZEaKTAGcFTyKmlbX9D0zXpUN2pLwEqsycmK+R6gj/ABWatyP9XllGoY/VupRi1yLVCltZK00C/E8wUjPkB+fnijKMUQysWI2gYPRfzqla6JZ6dH/5WdgpGCZTkH8x0on4EfgGF2B3d+xPpUVwG/69Q3KY+sC6VGb1zdXDB8ckPXbzOR6UI1biDXLjUJdN0DSn8SJiGmYA7T7/ACjoevPyonw+4t7q8sjG3wMG355MWqtxXxna6GzW33dpLkruwy4j5+Z7/l9abSrf5BUJu/UAcDM5/Lq2o3NyWufvDyH+WUlufp2/zTPwxN/5qf7yhiyM7ZVxzxVmW6teHtBi1Wa0SS5mwVAGCu4Zx6YB/OiXD9zY8a6dcLLF4M0RC/Afkz8rL6cv0q2599ZIXC/uG7sOZE1l/GYZjHHFaWgzmcDBbHXByOXr0qsvDseiWv8AE7SY3Vun4kmP5vUH0o/aWP8A4m4Jkst6xSkNACq4CPGxCggZx8o+tBdduIeDeEf4FBcC51F0YbVBONxJJx264HnSqkdhsB94x/UnNxJ5lldK1DVUja4ZbWIqBgDcxB59O35/Spk0TS9DtSzPDAwBUTzsCxPuSP0odw/xvda1xPZaWLaG2syGEjHJLEKdoz0GT2ob9sO6LVbA9UEJJx55OP2NEmmuNi1E4BnvKOzDOl6RYa0ZtUhEjRzSMo5kbtvw57Y6H1qHhvT7e6/isngxyhbtkQsgOFHajH2bQ+HwNp7J87CRo1Pq7YH1qbgrRbnSNJlS/QC4nuDIy7g2AQBz9fzNBY5TyLno4EEOGI4i/oKXC3ur6fa3DxwW8i7ARkg45+XfJ/xVySa9XWI7FpZBCI/FEhPxBc4PTlnPf1FY4GHi6hxFOzE7r0gEjBIUsM4o7GbO8ii1CDbIrxZR8cmVsH68gPTnStTYUsxj+v8A3EaNsAWWp3sep3GnwQieWJQ/iseWDjr5dfXrU7yavMvi7oFXGeTEnH0qrw4YrjWNeuW2lWuPBGcYbaSCMeXIUL4kPEVpeT3VnqCLZZ5RKF+BemDkf3ovArWbBgHHOYeFxmGYr2aSYwSlTImM7M881Ncb4TGpUhmkG5/KlbTNSksL5hqksS+KEcyvgbgRy9vanKHVdPv41tLKRdzJkEjavp/wCgs05Q/1PNkY47gvVLpfEAbJWTkoHTAqncSqUjy2eRP61c1HTpWuceIqhcYZef0qu+izldkc0bY5DccfrQpsAHMb6lIfG4WNS5PYdTRy30RYIRNqMsaZGdmcAe5oF4l1ouoQPPCy4PIEfMO+1un0qLVtWW7sJIbgs6eJujkkOGUZ96pFZbGPc8oyc5jtpsemPbvcmaIwIOfQKPc96WOJb62udTkeyz4YG0Me5pOsZpdTuUiR5PukJMjIWOABy5+ppwbS7VraT43EgDMxL+XXl5c6M0ChuTzOMn2yTEO70UXdzJNbILeMtyQ/uK9R8xnPNcn1Feq0ax4PiT9Tm4asq/x4AJPpUNEtCWP+JwNMu6NZAXUc8gdq3XOBmZKrlsTq/AukQaLpObmFJbq6UM467R2HvTLqrS2Okm73bJAN0bMcbQOfOl3SdWea4jEUYQPkgnmakl49i1DXf4XJYb7VVZHZjhi47gZxj9e9fIvVdbazsM+5rEFCF9Q3c8QwskLxFTLMwUx7ujEcj+n7U22dyLqFWHI918jXBrueyuLxvuQubcIwMPMHBz3Hb8qa9G45ubdVE0CvMvKcg4Dr5j/Vy9v7FZo2Vcp3BepHTKR24zZ4NOaaNSJVOAQeo8j70o6JxA1wDGIbj8IEMwiZg567gen600ahfWut8LvdhJVidSQGADfoaH6PG1tYww7gSiA7gMe3vyqQla0O8czP1GtbTVYA5mba51S83KtkIAD807Y3ewGT+1WTFqMY8IJaDcc58RuX/wCtWoWAOXyfzrcuJJlXGM96Wt5YZ2iZZ197dGLKvLp2tIl7cW3h3TiMKjEhGPuBQr7TdHW4itrqJhJkFAVHke31/SqP2iNImpBNw3bgw2rtA5fr70WsNTvtetk+C0gij6IEJy2Ovb/hPpWmF8YW4TW+Pvew4fqXYLGDinhWxLSLHIibSCcAOBj+30rHCuly8LQapeai6LEABGQcnauf7kD3qfh+xRbmaLbEQpUckIGMZ6ZPn+lKvGWqT3mqzafGWFlAw2wl9oz5nHX9KJEazKg8GX2ptPMO/Zrr0cX8VF64ig8RrrdJ0BYgHn9KNy63wtxNG0d6iCUDDLOm2QY7A5znljAPOkHh3RJdbsLmWK5FvHGXSQFSxYJtLAcxy+Ie+O1R8S8NzaJpFtdzXEb/AHhvg8MHdjrg56D61Qa0Z9ucGZ5dMmHVs9B07ifS/wCF3LtESH+Nsr17ZGexoZ9qGq2V3LbG0mFxE8C/jDPUM+ewx1FMmmcC2EVml3e3E11KIUlVT8Kry3EdeY6+XWqHFWgaPNxXp8E1qyxSpGxihIROZ29APIdBjvzoanQXA5yQIp7lxxKeg8ZSado1hZWNjLcTRwbcBsqSRkHauTyz3x70Utde4wOZZdA3xPgqEDAAe3Mkn6cqbtPs7HTEMGn20dukR2nw0AJ/PrU8yzEr4TqBzGx+Y5deYwRn6elRW3Us52pkn9xf+WR0JzDTdV/gWmXsd2ksOo3Id1WRGQ5IJ6EDByf1qnw7xTJouiHTyrSSK+Yg3QAn4geY8/qa6RqNtDqVoLPUrRHgl+FMSZYNjOegx+tLOk8P6DMkzXNhue3maE4J2ttOM4J/vT1voZSXX3zOn5FlGcSpwvMIOGSZp1ia4lkbxCcEZJ8/zofpeg29ze7ba+ebaN3xyhgT5E9qL67ZaVYaHBdNZrHGzhX8FAWyefInHLl0zVmy4dgtwrQ3E21kBAJweYyOlL8qhWtBP2Jnl+VUjGJYutBvHmjkk023mkRdolaRMRj9foBVxF8AbY0jD7e2KhXSFB3PdXbKPhO2cpt9B1yPpVa4t/u7xvHJKWZwvxvkAfSo3ZbMKDKKvlAzbG7ksyxK225LyOf/APNMnPpgdfzqeNhs3GB0Xz2/2BNQx4Vi2PiPU9zW4k7YqZsEYmr2JaubaHUbJrafDqw+Xy9V9R+tJF3wm938WpXqWsAJ2RoNxbHLz6/U+1NqTeHKoAyMj969exRrcyzhQWZv5hnaPIeVU0al6hgRfuAtN0Sw02CWOykm/F25MuPix5chW+pbwh8Js7tyN7Nnn+1b6jeCGEyyKSi9l60LZruWATPKkSMMhY1ycepNUJ5LD5GMImQyF0baI2kH9W4V6tD4w+bw3PmQRWKoxOZn/9k=",
+          file: "Fotune of Zombie.html",
+          },
+{ 
+          name:"Dragon fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "10x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqti_TcNDYAMxzXrL-AnO5cZs4AIyvjMj_NbGcx5f2Tw&s=10",
+          file: "dragon fishing.html",
+          },
+{ 
+          name:"dragon fishing 2",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "62x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb8806IFWDPPue2j1SR36ne3tX4tXpMGNCJwnVJ7RdYA&s=10",
+          file: "dragon fishing 2.html",
+          },
+{ 
+          name:"jackpot fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "45x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQofEhv4OQoBFPGEBSvemvpoidOrjRKPa8wwghHd36Hww&s=10",
+          file: "jackpot fishing.html",
+          },
+          { 
+          name:"jackpot fishing 2",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "50x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnPOVsa0LbsDROBQMVj67_tdD7SfPj9nTRMCi6R9UDcQ&s=10",
+          file: "jackpot fishing 2.html",
+          },
+{ 
+          name:"circus jackpot",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "60x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdBFP7GXrcXWWvfGuNDaCOy07sPZMZLUJ_6V7s44O6QQ&s=10",
+          file: "circus jackpot.html",
+          },
+{ 
+          name:"chai shen fishing jackpot",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "48x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtFXYzprtx9jkBggH6hFIEU_4QElCW8E_cRQt5ST0gNldj5K4nT9Jlj8w7&s=10",
+          file: "chai shen fishing jackpot",
+          },
+{ 
+          name:"dragon fortune",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "35x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLSdEbWlV9lDUPHpvJNLM9CHR0tK12veaz25YAXtPOyw&s=10",
+          file: "dragon fortune.html",
+          },
+{ 
+          name:"boom legend",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "24x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf11sua5oqLXpA0IgFQJJZF87Pkk3xyngyXyn3WC-Bvg&s",
+          file: "boom legend.html",
+          },
+{ 
+          name:"mega fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "45x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJfDO5iGKJNqx497bD9S55YdzyHhOX9oSs26XgX9LGhQ&s=10",
+          file: "mega fishing.html",
+          },
+{ 
+          name:"happy fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "65x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQarMT0ZRNNRPR_UrglqRjVFNgJWOwdH8ZRVqvvj_-S8g&s=10",
+          file: "happy fishing.html",
+          },
+{ 
+          name:"spirit tide legend",
+          cat: "fishing",
+          badge: "fishing",
+          mult: "35x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0pPuoCdoyqCP0B0w6OKd_xTuSV8BgFxvjwlJh9FqLrg&s=10",
+          file: "spirit tide legend.html",
+          },
+          { 
+          name:"fighter fire",
+          cat: "fishing",
+          badge: "fishing",
+          mult: "54x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlGTNSDVuLMVBC0PHe4CMMGUK2T2Oeci1LJSlMJ_afww&s=10",
+          file: "fighter fire.html",
+          },
+{ 
+          name:"paradise",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "65x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQQBwhyOrvdG083otnqsbWBF83eWIfStFqp2yj7j-4XA&s=10",
+          file: "paradise.html",
+          },
+{ 
+          name:"one shot fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "44x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFBYMTUA8_fYLRSAfB-gsSZPsfxinmWzWe5HiRCOYfOw&s=10",
+          file: "one shot fishing.html",
+          },
+{ 
+          name:"lucky fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "65x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPyp-ptYDZqTD_nUW4PfnS_eHH9TWfEy8cnnQvf4Z9Tg&s",
+          file: "lucky fishing.html",
+          },
+{ 
+          name:"hero fishing",
+          cat: "fishing",
+          badge: "fishing",
+          mult: "40x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeJnIIBPF9ocTOnx3WYyYmILluDou1KVc8cVtt1XwnOA&s=10",
+          file: "hero fishing.html",
+          },
+{ 
+          name:"shade dragon fishing",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "50x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3PKTmoYXX9JAEEVVv7GaXhsBr-HSBSRueLEkP1bdhMQ&s=10",
+          file: "shade dragon fishing.html",
+          },
+{ 
+          name:"fishing yilufa",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "28x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYu8RgLjKGOwpVx20n4EBFA2DgK-qw97WlAQijCJgo5Q&s=10",
+          file: "fishing yilufa",
+          },
+{ 
+          name:"dragon master",
+          cat: "fishing",
+          badge: "Fishing",
+          mult: "38x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa6PeCzw7vnb3oaNnPVilh3RYwPIFROMJO4rjIVGSz7Q&s=10",
+          file: "dragon master.html",
+          },
+          {name: "fishing disco",
+          cat: "fishing",
+          badge: "Fishing",
+          mult:"42x",
+          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_PYRUTeAAnwbdbpmjZc1XJH3O1A6uEHkVI_NDm-ouHg&s=10",
+          file: "fishing disco.html",
+          },
+          
+          
+          
+        ];
+
+        function renderGames(filter = 'hot') {
+    const grid = document.getElementById('gamesGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    // Active Tab Highlight
+    const tabs = document.querySelectorAll('.category-tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('onclick') && tab.getAttribute('onclick').toLowerCase().includes(filter.toLowerCase())) {
+            tab.classList.add('active');
+        }
+    });
+
+    // Sub-string / Case-Insensitive Matching
+    const searchTarget = filter.toLowerCase().trim();
+
+    const list = games.filter(g => {
+        if (!g.cat) return false;
+        const category = g.cat.toLowerCase().trim();
+
+        // 1. Hot Games
+        if (searchTarget === 'hot') return category === 'hot';
+
+        // 2. Fishing Games (handles 'fishing', 'Fishing', 'fish', etc.)
+        if (searchTarget.includes('fish') || category.includes('fish')) {
+            if (searchTarget.includes('fish') && category.includes('fish')) return true;
+        }
+
+        // 3. Live Casino & Cards (handles 'live casino', 'casino', 'cards')
+        if (searchTarget.includes('casino') || searchTarget.includes('card')) {
+            if (category.includes('casino') || category.includes('card')) return true;
+        }
+
+        // 4. General match (exact match or partial match)
+        return category === searchTarget || category.includes(searchTarget) || searchTarget.includes(category);
+    });
+
+    // Title Update
+    const catTitle = document.getElementById('catTitle');
+    if (catTitle) {
+        catTitle.innerText = `${filter.toUpperCase()} GAMES`;
+    }
+
+    // Grid Layout (2 Columns)
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    grid.style.gap = '12px';
+
+    // Game Cards Render
+    list.forEach(g => {
+        grid.innerHTML += `
+            <div class="game-card">
+                <div class="game-thumb">
+                    <div class="badge-container">
+                        <span class="badge ${(g.badge || '').toLowerCase()}">${g.badge || ''}</span>
+                        <span class="multiplier">${g.mult || ''}</span>
+                    </div>
+                    <img src="${g.img}" alt="${g.name}">
+                </div>
+                <div class="game-info">
+                    <div class="game-name">${g.name}</div>
+                    <button class="btn-play" onclick="window.launchGame('${g.file}')">PLAY NOW</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+window.launchGame = function(file) {
+    if (file) {
+        window.location.href = file;
+    }
+};
+      </script>
+<!-- Deposit Modal -->
+<div id="depositModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeDeposit()">&times;</span>
+    <h2>Deposit Funds</h2>
+    <p style="font-size: 13px; color: #aaa; text-align: center; margin-bottom: 15px;">
+      Scan QR & Pay via GPay / PhonePe / Paytm
+    </p>
+
+    <!-- Scanner Image -->
+    <div style="text-align: center; margin-bottom: 10px;">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=8437871238@fam&pn=VIPGaming" alt="UPI QR Code" style="width: 180px; height: 180px; border-radius: 10px; border: 2px solid #ffd700;">
+    </div>
+
+    <!-- UPI ID -->
+    <p style="text-align: center; font-weight: bold; color: #ffd700; margin-bottom: 20px;">
+      UPI ID: 8437871238@fam
+    </p>
+
+    <!-- Deposit Form -->
+    <form id="depositForm" onsubmit="submitDeposit(event)">
+      <div style="margin-bottom: 12px; text-align: left;">
+        <label style="font-size: 12px; color: #ccc;">Amount (₹):</label>
+        <input type="number" id="depositAmount" placeholder="Enter Amount (e.g. 500)" min="100" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; margin-top: 4px;">
+      </div>
+
+      <div style="margin-bottom: 15px; text-align: left;">
+        <label style="font-size: 12px; color: #ccc;">12-Digit UTR / Transaction ID:</label>
+        <input type="text" id="depositUtr" placeholder="Enter 12-digit UTR Number" maxlength="12" pattern="[0-9]{12}" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; margin-top: 4px;">
+      </div>
+
+      <button type="submit" class="btn-action btn-deposit" style="width: 100%; padding: 12px; font-weight: bold; cursor: pointer;">SUBMIT REQUEST</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// Open Deposit Modal
+window.openDeposit = function() {
+    const modal = document.getElementById('depositModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+};
+
+// Close Deposit Modal
+window.closeDeposit = function() {
+    const modal = document.getElementById('depositModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+// Submit Deposit Form Logic (Direct Telegram API)
+window.submitDeposit = async function(event) {
+    event.preventDefault();
+
+    const amount = document.getElementById('depositAmount').value;
+    const utr = document.getElementById('depositutr').value;
+
+    if (utr.length !== 12 || isNaN(utr)) {
+        alert("Kripya valid 12-digit numeric UTR number enter karein!");
+        return;
+    }
+
+    try {
+        // Yahan apna Google Apps Script ka lamba wala Web App URL daalein
+        const scriptUrl = '/api/deposit';
+
+        const response = await fetch('/api/deposit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount, utr })
+});
+
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            alert('Deposit request submitted successfully!');
+            document.getElementById('depositForm').reset();
+            if (typeof closeDeposit === 'function') {
+                closeDeposit();
+            }
+        } else {
+            alert('Error: ' + (data.message || 'Failed to send'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error! Check your internet connection.');
+    }
+};
+
+
+// Open Profile Modal
+window.openProfile = function() {
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        switchHistory('bets');
+    }
+};
+
+// Close Profile Modal
+window.closeProfile = function() {
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+// History Tab Switching Logic
+window.switchHistory = function(type) {
+    const tabs = document.querySelectorAll('.h-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+    }
+
+    const contentDiv = document.getElementById('historyContent');
+    if (!contentDiv) return;
+    
+    if (type === 'bets') {
+        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Bets Placed Yet</div>`;
+    } else if (type === 'deposit') {
+        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Deposit History</div>`;
+    } else if (type === 'withdraw') {
+        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Withdrawal History</div>`;
+    }
+};
+
+// Default Game Loader
+renderGames('hot');
+  
+</script>
+</body>
+</html>

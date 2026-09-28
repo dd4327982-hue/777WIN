@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Gaming - Admin Panel</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #ffd700;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background-color: #2a2a2a;
+            color: #ffd700;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-approve {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .status-Pending { color: #ffc107; font-weight: bold; }
+        .status-Approved { color: #28a745; font-weight: bold; }
+        .status-Rejected { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>VIP Admin Panel - Deposits</h1>
+    <button onclick="fetchRequests()" style="padding: 8px 16px; background: #ffd700; border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">Refresh List</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Amount (₹)</th>
+                <th>UTR / Txn ID</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="requestTable">
+            <tr>
+                <td colspan="5">Loading requests...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function fetchRequests() {
+        try {
+            const res = await fetch('/api/admin/requests');
+            const data = await res.json();
+            const tableBody = document.getElementById('requestTable');
+            tableBody.innerHTML = '';
+
+            if (data.requests.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5">Koi deposit request nahi hai.</td></tr>';
+                return;
+            }
+
+            data.requests.forEach(req => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${req.time}</td>
+                    <td>₹${req.amount}</td>
+                    <td><b>${req.utr}</b></td>
+                    <td class="status-${req.status}">${req.status}</td>
+                    <td>
+                        ${req.status === 'Pending' ? `
+                            <button class="btn btn-approve" onclick="takeAction(${req.id}, 'approve')">Approve</button>
+                            <button class="btn btn-reject" onclick="takeAction(${req.id}, 'reject')">Reject</button>
+                        ` : 'Processed'}
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (err) {
+            console.error('Error fetching requests:', err);
+        }
+    }
+
+    async function takeAction(id, action) {
+        try {
+            const res = await fetch('/api/admin/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, action })
+            });
+            const data = await res.json();
+            alert(data.message);
+            fetchRequests();
+        } catch (err) {
+            alert('Action failed!');
+        }
+    }
+
+    // Auto fetch on load
+    fetchRequests();
+</script>
+
+</body>
+</html>

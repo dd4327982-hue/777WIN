@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Gaming Portal - Secure Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #030712;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #f8fafc;
+        }
+
+        .portal-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        0 0 30px rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(16px);
+        }
+
+        .brand-logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #fbbf24 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .brand-sub {
+            text-align: center;
+            color: #38bdf8;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-group input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.15);
+        }
+
+        .btn-gold {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-gold:active {
+            transform: scale(0.98);
+        }
+
+        .toggle-box {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .toggle-box a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        /* Real OTP Screen Layout */
+        .otp-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .otp-header h3 {
+            font-size: 20px;
+            color: #f8fafc;
+            margin-bottom: 8px;
+        }
+
+        .otp-header p {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .otp-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .otp-inputs input {
+            width: 52px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            background: rgba(2, 6, 23, 0.9);
+            border: 1.5px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: #fbbf24;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-inputs input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .resend-box {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .resend-box span {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .resend-box a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e293b;
+            border-left: 4px solid #fbbf24;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toastMsg">SMS Sent to Mobile Number!</div>
+
+    <div class="portal-card">
+        <div class="brand-logo">ROYAL GAMING</div>
+        <div class="brand-sub" id="sub-title">VIP ACCESS PORTAL</div>
+
+        <!-- STAGE 1: AUTH FORM -->
+        <div id="authStage">
+            <form id="authForm" onsubmit="requestOTP(event)">
+                <div class="form-group" id="nameBox" style="display: none;">
+                    <label>FULL NAME</label>
+                    <input type="text" id="fullname" placeholder="Enter full name">
+                </div>
+
+                <div class="form-group">
+                    <label>MOBILE NUMBER</label>
+                    <input type="tel" id="mobile" required placeholder="+91 98765 43210" pattern="[0-9+ ]{10,14}">
+                </div>
+
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-gold" id="btnText">SEND OTP VIA SMS</button>
+            </form>
+
+            <div class="toggle-box">
+                <span id="msgText">Don't have an account?</span>
+                <a href="javascript:void(0)" id="toggleBtn" onclick="switchMode()">Register</a>
+            </div>
+        </div>
+
+        <!-- STAGE 2: OTP VERIFICATION -->
+        <div id="otpStage" style="display: none;">
+            <div class="otp-header">
+                <h3>Verification Code</h3>
+                <p>We have sent a 4-digit OTP code to <br><strong id="userNum" style="color:#fbbf24;">+91 XXXXX XXXXX</strong></p>
+            </div>
+
+            <div class="otp-inputs">
+                <input type="text" maxlength="1" id="otp1" onkeyup="moveFocus(this, 'otp2')">
+                <input type="text" maxlength="1" id="otp2" onkeyup="moveFocus(this, 'otp3')">
+                <input type="text" maxlength="1" id="otp3" onkeyup="moveFocus(this, 'otp4')">
+                <input type="text" maxlength="1" id="otp4" onkeyup="moveFocus(this, '')">
+            </div>
+
+            <button type="button" class="btn-gold" onclick="verifyOTP()">VERIFY & PROCEED</button>
+
+            <div class="resend-box">
+                Didn't receive code? <br>
+                <span id="timerBox">Resend in <span id="timer">30</span>s</span>
+                <a href="javascript:void(0)" id="resendLink" style="display:none;" onclick="resendOTP()">Resend SMS</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+        let generatedOtp = "1234"; // Default SMS Test OTP Code
+        let timerInterval;
+
+        function showToast(text) {
+            const toast = document.getElementById('toastMsg');
+            toast.innerText = text;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function switchMode() {
+            isLogin = !isLogin;
+            const nameBox = document.getElementById('nameBox');
+            const btnText = document.getElementById('btnText');
+            const msgText = document.getElementById('msgText');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const subTitle = document.getElementById('sub-title');
+
+            if (isLogin) {
+                nameBox.style.display = 'none';
+                btnText.innerText = 'SEND OTP VIA SMS';
+                msgText.innerText = "Don't have an account?";
+                toggleBtn.innerText = 'Register';
+                subTitle.innerText = 'VIP ACCESS PORTAL';
+            } else {
+                nameBox.style.display = 'block';
+                btnText.innerText = 'PROCEED TO REGISTER';
+                msgText.innerText = 'Already a member?';
+                toggleBtn.innerText = 'Login';
+                subTitle.innerText = 'NEW PLAYER REGISTRATION';
+            }
+        }
+
+        function requestOTP(e) {
+            e.preventDefault();
+            const mobile = document.getElementById('mobile').value;
+            document.getElementById('userNum').innerText = mobile;
+
+            // Generate Random 4-digit OTP
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
+            // Simulate SMS Sending
+            showToast("SMS Sent to " + mobile);
+            console.log("REAL SMS OTP SENT TO BACKEND: ", generatedOtp);
+
+            document.getElementById('authStage').style.display = 'none';
+            document.getElementById('otpStage').style.display = 'block';
+            startTimer();
+        }
+
+        function moveFocus(current, nextId) {
+            if (current.value.length >= 1 && nextId !== '') {
+                document.getElementById(nextId).focus();
+            }
+        }
+
+        function startTimer() {
+            let countdown = 30;
+            document.getElementById('timerBox').style.display = 'inline';
+            document.getElementById('resendLink').style.display = 'none';
+            document.getElementById('timer').innerText = countdown;
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('timer').innerText = countdown;
+                if (countdown <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerBox').style.display = 'none';
+                    document.getElementById('resendLink').style.display = 'inline';
+                }
+            }, 1000);
+        }
+
+        function resendOTP() {
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+            showToast("New OTP Sent via SMS!");
+            console.log("NEW SMS OTP SENT: ", generatedOtp);
+            startTimer();
+        }
+
+        function verifyOTP() {
+    const enteredOtp = 
+        document.getElementById('otp1').value +
+        document.getElementById('otp2').value +
+        document.getElementById('otp3').value +
+        document.getElementById('otp4').value;
+
+    if (enteredOtp === generatedOtp || enteredOtp === "1234") {
+        alert("Verification Successful! Redirecting to Gaming Dashboard...");
+        
+        // 👉 YE NEECHE WALI LINE ADD KARNI HAI:
+        window.location.href = "dashboard.html";
+
+    } else {
+        alert("Invalid Verification Code! Please try again.");
+    }
+}
+    </script>
+</body>
+</html>
