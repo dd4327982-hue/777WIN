@@ -1,5 +1,5 @@
 const express = require('express');
-coyM9uNNz07MvnXPmYre('path');
+const path = require('path');
 const mongoose = require('mongoose');
 
 const app = express();
