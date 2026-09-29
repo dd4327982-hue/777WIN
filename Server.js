@@ -17,7 +17,7 @@ const TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
 const ADMIN_CHAT_ID = '8566606809';
 
 // 1. MongoDB Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://dd4327982_db_user:yM9uNNz07MvnXPmY@ac-woefusx-shard-00-00.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-01.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-02.heppxyt.mongodb.net:27017/?ssl=true&replicaSet')
+mongoose.connect(process.env.MONGO_URI || 'mongodb://dd4327982_db_user:yM9uNNz07MvnXPmY@ac-woefusx-shard-00-00.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-01.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-02.heppxyt.mongodb.net:27017/?ssl=true')
     .then(() => console.log('🚀 MongoDB Connected Successfully'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
