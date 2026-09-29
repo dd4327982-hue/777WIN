@@ -11,12 +11,10 @@ app.use(express.static(path.join(__dirname)));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Index.html'));
 });
-
-// Telegram Configuration
-const TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
+//Telegram Configuration
+TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
 const ADMIN_CHAT_ID = '8566606809';
 
-// 1. MongoDB Connection
 // 1. MongoDB Connection (Direct URL)
 mongoose.connect('mongodb://dd4327982_db_user:<yM9uNNz07MvnXPmY>@ac-woefusx-shard-00-00.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-01.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-02.heppxyt.mongodb.net:27017/?ssl=true&replicaSet=atlas-o34p2y-shard-0&authSource=admin&appName=Cluster0&compressors=zlib')
     .then(() => console.log('✅ MongoDB Connected Successfully'))
@@ -93,6 +91,17 @@ app.post('/api/deposit', async (req, res) => {
       time: new Date().toLocaleTimeString()
     });
     await newRequest.save();
+    // Send alert to admin via Telegram
+await fetch(`https://api.telegram.org/bot8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        chat_id: 8566606809,
+        text: messageText,
+        parse_mode: 'Markdown',
+        reply_markup: keyboard
+    })
+});
 
     const messageText = `⚠️ *New Deposit Request* ⚠️\n\n👤 *User:* ${username}\n💰 *Amount:* ₹${depositAmount}\n🆔 *UTR:* \`${utr}\`\n⏳ *Status:* PENDING`;
     
