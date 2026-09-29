@@ -18,7 +18,7 @@ const ADMIN_CHAT_ID = '8566606809';
 
 // 1. MongoDB Connection
 // 1. MongoDB Connection (Direct URL)
-mongoose.connect('mongodb+srv://<dd4327982_db_user>:<>@cluster.mongodb.net/777win?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://<dd4327982_db_user>:<yM9uNNz07MvnXPmY>@cluster.mongodb.net/777win?retryWrites=true&w=majority')
     .then(() => console.log('✅ MongoDB Connected Successfully'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
