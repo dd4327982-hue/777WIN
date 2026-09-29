@@ -68,9 +68,10 @@ app.post('/api/deposit', async (req, res) => {
   const { username, amount, utr } = req.body;
   const depositAmount = parseFloat(amount);
 
-  if (!username || !depositAmount || !utr) {
-    return res.status(400).json({ success: false, message: 'Amount, Username and UTR required.' });
-  }
+  if (!depositAmount || !utr) {
+    return res.status(400).json({ success: false, message: 'Amount and UTR required.' });
+}
+
 
   if (depositAmount < 100) {
     return res.status(400).json({ success: false, message: 'Minimum deposit amount is ₹100.' });
