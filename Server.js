@@ -1,24 +1,25 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
-const PORT = process.env.PORT || 3000;
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Index.html'));
 });
 
-const app = express();
-const PORT = 3000;
-
 // Telegram Configuration
-const TELEGRAM_BOT_TOKEN = '8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ';
+const TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
 const ADMIN_CHAT_ID = '8566606809';
 
-// 1. MongoDB Connection
-mongoose.connect('mongodb://127.0.0.1:27017/shopbro_db')
-  .then(() => console.log('🚀 MongoDB Connected Successfully!'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+// 1. MongoDB Connection (Local ki jagah Atlas ya environment variable use karein)
+mongoose.connect(process.env.MONGO_URI || 'YOUR_MONGODB_ATLAS_URL_HERE')
+    .then(() => console.log('🚀 MongoDB Connected Successfully'))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // 2. Database Schemas & Models
 
