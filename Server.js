@@ -16,17 +16,15 @@ app.get('/', (req, res) => {
 const TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
 const ADMIN_CHAT_ID = '8566606809';
 
-// 1. MongoDB Connection (Local ki jagah Atlas ya environment variable use karein)
+// 1. MongoDB Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://dd4327982_db_user:yM9uNNz07MvnXPmY@ac-woefusx-shard-00-00.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-01.heppxyt.mongodb.net:27017,ac-woefusx-shard-00-02.heppxyt.mongodb.net:27017/?ssl=true&replicaSet')
     .then(() => console.log('🚀 MongoDB Connected Successfully'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// 2. Database Schemas & Models
-
 // User Schema
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  wallet_balance: { type: Number, default: 0.00 }
+    username: { type: String, required: true, unique: true },
+    wallet_balance: { type: Number, default: 0 }
 });
 const User = mongoose.model('User', userSchema);
 
