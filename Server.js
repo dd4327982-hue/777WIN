@@ -90,9 +90,7 @@ app.post('/api/deposit', async (req, res) => {
       status: 'Pending',
       time: new Date().toLocaleTimeString()
     });
-    await newRequest.save();
-    // Send alert to admin via Telegram
-await fetch(`https://api.telegram.org/bot8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ/sendMessage`, {
+   await fetch(`https://api.telegram.org/bot8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -102,6 +100,7 @@ await fetch(`https://api.telegram.org/bot8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_Kews
         reply_markup: keyboard
     })
 });
+
 
     const messageText = `⚠️ *New Deposit Request* ⚠️\n\n👤 *User:* ${username}\n💰 *Amount:* ₹${depositAmount}\n🆔 *UTR:* \`${utr}\`\n⏳ *Status:* PENDING`;
     
