@@ -112,18 +112,6 @@ await fetch(`https://api.telegram.org/bot8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_Kews
       ]]
     };
 
-    await fetch(`https://api.telegram.org/bot${'8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ'}/sendMessage`, {
-
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: ADMIN_CHAT_ID,
-        text: messageText,
-        parse_mode: 'Markdown',
-        reply_markup: keyboard
-      })
-    });
-
     res.json({ success: true, message: 'Deposit request submitted successfully! Awaiting approval.' });
   } catch (error) {
     console.error(error);
@@ -267,7 +255,7 @@ app.post('/api/telegram-webhook', async (req, res) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: chatId,
+            chat_id: 8566606809,
             message_id: messageId,
             text: updatedText,
             parse_mode: 'Markdown'
