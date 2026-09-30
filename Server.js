@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Index.html'));
 });
 //Telegram Configuration
-TELEGRAM_BOT_TOKEN = '8744660851:AAE...';
+TELEGRAM_BOT_TOKEN = '8744660851:AAEOG8ZUAroYJ5X1M1IG6qs_KewsniifRmQ';
 const ADMIN_CHAT_ID = '8566606809';
 
 // 1. MongoDB Connection (Direct URL)
