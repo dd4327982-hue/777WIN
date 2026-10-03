@@ -30,11 +30,13 @@ def home():
 
 @app.route('/dashboard')
 def dashboard():
-    try:
-        with open('dashboard.html', 'r', encoding='utf-8') as f:
-            return render_template_string(f.read())
-    except FileNotFoundError:
-        return "<h3>Dashboard.html not found!</h3>"
+    possible_names = ['dashboard.html', 'Dashboard.html', 'DASHBOARD.HTML']
+    for name in possible_names:
+        if os.path.exists(name):
+            with open(name, 'r', encoding='utf-8') as f:
+                return render_template_string(f.read())
+    files_in_dir = os.listdir('.')
+    return f"<h3>Dashboard.html not found! Files available:</h3> <p>{files_in_dir}</p>"
 
 # --- SECURE ADMIN LOGIN & PANEL ---
 @app.route('/secure-admin-panel-777', methods=['GET', 'POST'])
