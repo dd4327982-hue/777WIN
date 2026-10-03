@@ -356,7 +356,8 @@
             // Test Verification (Backend SMS Integration Point)
             if (enteredOtp === generatedOtp || enteredOtp === "1234") {
                 alert("Verification Successful! Redirecting to Gaming Dashboard...");
-            } else {
+           window.location.href = "dashboard.html";
+ } else {
                 alert("Invalid Verification Code! Please try again.");
             }
         }
