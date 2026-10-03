@@ -347,22 +347,19 @@
         }
 
         function verifyOTP() {
-    const enteredOtp = 
-        document.getElementById('otp1').value +
-        document.getElementById('otp2').value +
-        document.getElementById('otp3').value +
-        document.getElementById('otp4').value;
+            const enteredOtp = 
+                document.getElementById('otp1').value +
+                document.getElementById('otp2').value +
+                document.getElementById('otp3').value +
+                document.getElementById('otp4').value;
 
-    if (enteredOtp === generatedOtp || enteredOtp === "1234") {
-        alert("Verification Successful! Redirecting to Gaming Dashboard...");
-        
-        // 👉 YE NEECHE WALI LINE ADD KARNI HAI:
-        window.location.href = "dashboard.html";
-
-    } else {
-        alert("Invalid Verification Code! Please try again.");
-    }
-}
+            // Test Verification (Backend SMS Integration Point)
+            if (enteredOtp === generatedOtp || enteredOtp === "1234") {
+                alert("Verification Successful! Redirecting to Gaming Dashboard...");
+            } else {
+                alert("Invalid Verification Code! Please try again.");
+            }
+        }
     </script>
 </body>
 </html>
