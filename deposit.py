@@ -17,11 +17,16 @@ user_wallets = {}
 
 @app.route('/')
 def home():
-    try:
-        with open('index.html', 'r', encoding='utf-8') as f:
-            return render_template_string(f.read())
-    except FileNotFoundError:
-        return "<h3>Index.html not found in repository root directory!</h3>"
+    # Saare possible spellings check karega
+    possible_names = ['Index.html', 'index.html', 'INDEX.HTML']
+    for name in possible_names:
+        if os.path.exists(name):
+            with open(name, 'r', encoding='utf-8') as f:
+                return render_template_string(f.read())
+                
+    # Agar phir bhi na mile, toh dikhaye ki folder me kya-kya hai (Debugging ke liye)
+    files_in_dir = os.listdir('.')
+    return f"<h3>Index.html not found! Files available in root directory:</h3> <p>{files_in_dir}</p>"
 
 @app.route('/dashboard')
 def dashboard():
