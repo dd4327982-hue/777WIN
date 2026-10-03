@@ -38,17 +38,17 @@ def submit():
     utr = request.form.get('utr')
 
     if not username or not amount or not utr:
-        return jsonify({"status": "error", "message": "All fields are required!"})
+        return "<h3>All fields are required! <a href='/dashboard'>Go Back</a></h3>", 400
 
     try:
         amount = float(amount)
     except ValueError:
-        return jsonify({"status": "error", "message": "Invalid amount format!"})
+        return "<h3>Invalid amount format! <a href='/dashboard'>Go Back</a></h3>", 400
 
     # Duplicate UTR check
     for d in deposits:
         if d['utr'] == utr:
-            return jsonify({"status": "error", "message": "This UTR has already been used!"})
+            return "<h3>This UTR has already been used! <a href='/dashboard'>Go Back</a></h3>", 400
 
     deposit_record = {
         'username': username.strip(),
@@ -62,7 +62,13 @@ def submit():
         user_history[username] = []
     user_history[username].append(deposit_record)
 
-    return jsonify({"status": "success", "message": "Deposit request submitted successfully! Status: Pending"})
+    # Submit hone ke baad user ko seedha dashboard par bhej dega success message ke sath
+    return render_template_string('''
+        <script>
+            alert("Deposit request submitted successfully! Status: Pending");
+            window.location.href = "/dashboard";
+        </script>
+    ''')
 
 @app.route('/user/history/<username>')
 def get_user_history(username):
