@@ -380,7 +380,7 @@ body {
         </div>
         <div class="header-actions">
             <button class="btn-action btn-deposit" onclick="openDeposit()">Deposit</button>
-            <button class="btn-action btn-withdraw">Withdraw</button>
+            <button class="btn-action btn-withdraw" onclick="window.location.href='/withdraw.html'">Withdraw</button>
         </div>
     </header>
 
@@ -399,6 +399,7 @@ body {
         <div class="section-title" id="catTitle">HOT GAMES</div>
         <div class="games-grid" id="gamesGrid"></div>
     </div>
+   
 <!-- User Profile Modal -->
 <div id="profileModal" class="modal-overlay">
     <div class="modal-content">
@@ -411,7 +412,7 @@ body {
         </div>
 
         <div class="history-tabs">
-            <div class="h-tab active" onclick="switchHistory('bets')">Game Bets</div>
+            <div class="h-tab active" onclick="switchHistory('bets')">bonus</div>
             <div class="h-tab" onclick="switchHistory('deposit')">Deposit</div>
             <div class="h-tab" onclick="switchHistory('withdraw')">Withdraw</div>
         </div>
@@ -849,7 +850,7 @@ window.launchGame = function(file) {
     </p>
 
     <!-- Deposit Form -->
-    <form id="depositForm" action="https://seven77win.onrender.com/submit" method="POST">
+    <form id="depositForm" onsubmit="submitDeposit(event)">
     <div style="margin-bottom: 12px; text-align: left;">
         <label style="font-size: 12px; color: #ccc;">Username</label>
         <input type="text" name="username" placeholder="Enter Username" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; margin-top: 4px;">
@@ -866,7 +867,7 @@ window.launchGame = function(file) {
 </form>
 
 
-<script>
+<script>  
 // Open Deposit Modal
 window.openDeposit = function() {
     const modal = document.getElementById('depositModal');
@@ -874,6 +875,7 @@ window.openDeposit = function() {
         modal.style.display = 'flex';
     }
 };
+      
   // Close Deposit Modal
 window.closeDeposit = function() {
     const modal = document.getElementById('depositModal');
@@ -885,6 +887,7 @@ window.closeDeposit = function() {
 window.submitDeposit = async function(event) {
     event.preventDefault();
 
+    const username = document.getElementById('username')?.value || 'Player';
     const amount = document.getElementById('depositAmount').value;
     const utr = document.getElementById('depositutr').value;
 
@@ -894,14 +897,19 @@ window.submitDeposit = async function(event) {
     }
 
     try {
-        const response = await fetch('http://192.168.1.3:5001/submit', {
+        const response = await fetch('http://localhost:3000/submit-request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount, utr })
+            body: JSON.stringify({
+                type: 'Deposit',
+                username: username,
+                amount: amount,
+                utr: utr,
+                upi: 'X'
+            })
         });
 
         const data = await response.json();
-
         if (data.status === 'success') {
             alert('Deposit request submitted successfully!');
             document.getElementById('depositForm').reset();
@@ -913,16 +921,15 @@ window.submitDeposit = async function(event) {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Network error! Check your internet connection.');
+        alert('Network error! Check your server.');
     }
 };
-
-  // Open Profile Modal
+    // Open Profile Modal
 window.openProfile = function() {
     const modal = document.getElementById('profileModal');
     if (modal) {
         modal.style.display = 'flex';
-        switchHistory('bets');
+        switchHistory('bonus');
     }
 };
 
@@ -933,31 +940,153 @@ window.closeProfile = function() {
         modal.style.display = 'none';
     }
 };
+  // Backend se live balance fetch karne ka function
+async function fetchUserBalance() {
+    try {
+        const response = await fetch('http://localhost:3000/user/data');
+        const userData = await response.json();
+        
+        // Jahan bhi dashboard par balance dikhta hai, wahan update kar do
+        const balanceElements = document.querySelectorAll('.user-balance, #userBalance, #balanceDisplay');
+        balanceElements.forEach(el => {
+            el.innerText = `₹${userData.balance.toFixed(2)}`;
+        });
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+    }
+}
 
-// History Tab Switching Logic
+// Page khulte hi aur har 3 second me balance auto-sync hoga
+setInterval(fetchUserBalance, 3000);
+window.onload = function() {
+    if (typeof fetchUserBalance === 'function') {
+        fetchUserBalance();
+    }
+};
+
+// History Tab Switching aur Data Render karne ka logic (Updated with Bonus)
 window.switchHistory = function(type) {
     const tabs = document.querySelectorAll('.h-tab');
     tabs.forEach(tab => tab.classList.remove('active'));
     
-    if (window.event && window.event.target) {
-        window.event.target.classList.add('active');
-    }
+    event.target.classList.add('active');
 
     const contentDiv = document.getElementById('historyContent');
     if (!contentDiv) return;
-    
-    if (type === 'bets') {
-        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Bets Placed Yet</div>`;
-    } else if (type === 'deposit') {
-        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Deposit History</div>`;
-    } else if (type === 'withdraw') {
-        contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px 0;">No Withdrawal History</div>`;
+
+    if (type === 'bonus') {
+        let bonuses = JSON.parse(localStorage.getItem('user_bonuses') || '[]');
+        if (bonuses.length === 0) {
+            contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No bonus history available. Check out the Bonus section to claim rewards!</div>`;
+        } else {
+            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+            bonuses.forEach(item => {
+                html += `
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="color: #ffd700; font-weight: bold; font-size: 15px;">+ ₹${item.amount} Bonus</div>
+                            <div style="color: #94a3b8; font-size: 12px;">${item.description || 'Deposit Reward'}</div>
+                        </div>
+                        <div>
+                            <span style="color: #22c55e; font-weight: bold; font-size: 13px;">Credited</span>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            contentDiv.innerHTML = html;
+        }
+    } 
+    else if (type === 'deposit') {
+        let deposits = JSON.parse(localStorage.getItem('admin_deposit_requests') || '[]');
+        if (deposits.length === 0) {
+            contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No deposit history available.</div>`;
+        } else {
+            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+            deposits.forEach(item => {
+                let statusColor = item.status === 'Approved' ? '#22c55e' : (item.status === 'Rejected' ? '#ef4444' : '#f59e0b');
+                html += `
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="color: #ffd700; font-weight: bold; font-size: 15px;">+ ₹${item.amount}</div>
+                            <div style="color: #94a3b8; font-size: 12px;">UTR: ${item.utr || 'N/A'}</div>
+                        </div>
+                        <div>
+                            <span style="color: ${statusColor}; font-weight: bold; font-size: 13px;">${item.status || 'Pending'}</span>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            contentDiv.innerHTML = html;
+        }
+    } 
+    else if (type === 'withdraw') {
+        let withdraws = JSON.parse(localStorage.getItem('admin_withdraw_requests') || '[]');
+        if (withdraws.length === 0) {
+            contentDiv.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No withdrawal history available.</div>`;
+        } else {
+            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+            withdraws.forEach(item => {
+                let statusColor = item.status === 'Approved' ? '#22c55e' : (item.status === 'Rejected' ? '#ef4444' : '#f59e0b');
+                html += `
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="color: #ef4444; font-weight: bold; font-size: 15px;">- ₹${item.amount}</div>
+                            <div style="color: #94a3b8; font-size: 12px;">UPI: ${item.upi}</div>
+                        </div>
+                        <div>
+                            <span style="color: ${statusColor}; font-weight: bold; font-size: 13px;">${item.status || 'Pending'}</span>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            contentDiv.innerHTML = html;
+        }
     }
 };
 
 // Default Game Loader
 renderGames('hot');
-  
-</script>
+  // Dashboard par balance load aur sync karne ke liye
+function syncDashboardBalance() {
+    let bal = localStorage.getItem('user_balance');
+    if (bal === null) {
+        bal = 0.00; // Default starting balance
+        localStorage.setItem('user_balance', bal);
+    }
+    let balanceDiv = document.querySelector('.wallet-balance');
+    if (balanceDiv) {
+        balanceDiv.innerText = '₹' + parseFloat(bal).toFixed(2);
+    }
+}
+
+// Page load hote hi sync karo
+syncDashboardBalance();
+ 
+ </script>
+        <!-- 91Club Style Fixed Right Floating Panel -->
+    <div id="floatingRightPanel" style="position: fixed !important; right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; gap: 10px !important; background: rgba(20, 20, 20, 0.75) !important; padding: 8px !important; border-radius: 25px !important; backdrop-filter: blur(5px) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;">
+        
+        <!-- 1. Bonus -->
+        <a href="bonus.html" title="Bonus" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; background: rgba(255,255,255,0.1);">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTnfdc-QHG-3a6f-j_4D2hRc6agjN4uFrRO1wiYBcY4g&s=10" alt="Bonus" style="width: 22px; height: 22px; object-fit: contain;">
+        </a>
+
+        <!-- 2. Referral -->
+        <a href="referral.html" title="Referral" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; background: rgba(255,255,255,0.1);">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq2QFzHmQJasL3nM__oF7t_8kH70gOHkfKfaTNTuA6TA&s=10" alt="Referral" style="width: 22px; height: 22px; object-fit: contain;">
+        </a>
+
+        <!-- 3. Profile -->
+        <button onclick="openProfile()" title="Profile" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 50%; background: rgba(255,255,255,0.1); cursor: pointer;">
+            <img src="https://img.magnific.com/free-vector/user-circles-set_78370-4704.jpg?semt=ais_hybrid&w=740&q=80" alt="Profile" style="width: 22px; height: 22px; object-fit: contain;">
+        </button>
+
+        <!-- 4. Support / Rules -->
+        <a href="support.html" title="Rules" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; background: rgba(255,255,255,0.1);">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrfpkhiDGvxq70b6tnsriHyvLoJl0PB8NsnEdsX0FsuQ&s=10" alt="Support" style="width: 22px; height: 22px; object-fit: contain;">
+        </a>
+
+    </div>
+
 </body>
 </html>

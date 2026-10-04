@@ -3,134 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Gaming - Admin Panel</title>
+    <title>Secret Admin Portal</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            margin: 0;
-        }
-        h1 {
-            color: #ffd700;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #1e1e1e;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-        }
-        th {
-            background-color: #2a2a2a;
-            color: #ffd700;
-        }
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-approve {
-            background-color: #28a745;
-            color: #fff;
-        }
-        .btn-reject {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .status-Pending { color: #ffc107; font-weight: bold; }
-        .status-Approved { color: #28a745; font-weight: bold; }
-        .status-Rejected { color: #dc3545; font-weight: bold; }
+        body { background: #0f1215; color: #fff; font-family: sans-serif; padding: 20px; }
+        .lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: height: 80vh; margin-top: 100px; }
+        .admin-panel { display: none; }
+        input, button { padding: 10px; margin: 5px; border-radius: 8px; border: none; }
+        button { background: #ffd700; color: #000; font-weight: bold; cursor: pointer; }
+        .request-card { background: #1a1f24; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #ffd700; }
     </style>
 </head>
 <body>
-  <div class="container">
-    <h1>VIP Admin Panel - Deposits</h1>
-    <button onclick="fetchRequests()" style="padding: 8px 16px; background: #ffd700; border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">Refresh List</button>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Amount (₹)</th>
-                <th>UTR / Txn ID</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="requestTable">
-            <tr>
-                <td colspan="5">Loading requests...</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <!-- Security Lock Screen (Password Protection) -->
+    <div id="lockScreen" class="lock-screen">
+        <h2>🔒 Restricted Admin Access</h2>
+        <p>Enter Master Password to Unlock</p>
+        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <button onclick="checkAdminPassword()">Access Portal</button>
+    </div>
 
-<script>
-    async function fetchRequests() {
+    <!-- Main Admin Dashboard (Hidden by default) -->
+    <div id="adminPanel" class="admin-panel">
+        <h1>👑 Admin Control Panel</h1>
+        <div id="requestsContainer">
+            <!-- Dynamic Deposit & Withdrawal requests yahan aayengi -->
+        </div>
+    </div>
+
+    <script>
+    function checkAdminPassword() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === "admin123") { // Yahan apna password change kar sakta hai
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAdminRequests();
+            // Har 3 second me auto-refresh hoga taaki naye requests turant dikhein
+            setInterval(loadAdminRequests, 3000);
+        } else {
+            alert("Wrong Password! Access Denied.");
+        }
+    }
+
+    async function loadAdminRequests() {
         try {
-            const res = await fetch('/api/admin/requests');
-            const data = await res.json();
-            const tableBody = document.getElementById('requestTable');
-            tableBody.innerHTML = '';
+            const response = await fetch('http://localhost:3000/admin/requests');
+            const requests = await response.json();
+            
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = '';
 
-            if (data.requests.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5">Koi deposit request nahi hai.</td></tr>';
+            if (requests.length === 0) {
+                container.innerHTML = '<p style="color: #888;">No pending requests right now.</p>';
                 return;
             }
 
-            data.requests.forEach(req => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${req.time}</td>
-                    <td>₹${req.amount}</td>
-                    <td><b>${req.utr}</b></td>
-                    <td class="status-${req.status}">${req.status}</td>
-                    <td>
-                        ${req.status === 'Pending' ? `
-                            <button class="btn btn-approve" onclick="takeAction(${req.id}, 'approve')">Approve</button>
-                            <button class="btn btn-reject" onclick="takeAction(${req.id}, 'reject')">Reject</button>
-                        ` : 'Processed'}
-                    </td>
+            requests.forEach(req => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.innerHTML = `
+                    <p><b>Type:</b> <span style="color: ${req.type === 'Deposit' ? '#00ffcc' : '#ff4d4d'}">${req.type}</span></p>
+                    <p><b>Username:</b> ${req.username}</p>
+                    <p><b>Amount:</b> ₹${req.amount}</p>
+                    <p><b>UTR (Deposit):</b> ${req.utr}</p>
+                    <p><b>UPI (Withdrawal):</b> ${req.upi}</p>
+                    <p><b>Status:</b> <span style="color: #ffd700;">${req.status}</span></p>
+                    ${req.status === 'Pending' ? `
+                        <button onclick="handleAction(${req.id}, 'Accept')" style="background: #28a745; color: #fff;">Accept</button>
+                        <button onclick="handleAction(${req.id}, 'Reject')" style="background: #dc3545; color: #fff;">Reject</button>
+                    ` : ''}
                 `;
-                tableBody.appendChild(tr);
+                container.appendChild(card);
             });
-        } catch (err) {
-            console.error('Error fetching requests:', err);
+        } catch (error) {
+            console.error('Error loading requests:', error);
         }
     }
 
-    async function takeAction(id, action) {
+    async function handleAction(requestId, action) {
         try {
-            const res = await fetch('/api/admin/action', {
+            const response = await fetch('http://localhost:3000/admin/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, action })
+                body: JSON.stringify({ requestId, action })
             });
-            const data = await res.json();
+
+            const data = await response.json();
             alert(data.message);
-            fetchRequests();
-        } catch (err) {
-            alert('Action failed!');
+            loadAdminRequests(); // Turant list refresh karo
+        } catch (error) {
+            console.error('Error executing action:', error);
+            alert('Failed to process action.');
         }
     }
-
-    // Auto fetch on load
-    fetchRequests();
 </script>
 
 </body>

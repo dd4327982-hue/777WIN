@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawal Portal</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .withdraw-container {
+            width: 100%;
+            max-width: 400px;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffd700;
+        }
+        h2 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        .balance-box {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+            font-size: 16px;
+        }
+        .balance-box span {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        input:focus {
+            border-color: #ffd700;
+            outline: none;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="withdraw-container">
+        <h2>Withdrawal Portal</h2>
+        
+        <div class="balance-box">
+            Available Balance: <span id="userBalance">₹0.00</span>
+        </div>
+
+        <form id="withdrawForm" onsubmit="handleWithdrawal(event)">
+            <div class="form-group">
+                <label>Withdrawal Amount (₹110 - ₹50,000)</label>
+                <input type="number" id="withdrawAmount" placeholder="Enter amount" required>
+            </div>
+
+            <div class="form-group">
+                <label>Enter UPI ID</label>
+                <input type="text" id="upiId" placeholder="e.g. username@okhdfcbank" required>
+            </div>
+
+            <button type="submit" class="btn-submit">SUBMIT WITHDRAWAL</button>
+        </form>
+
+        <a href="/dashboard" class="back-link">&larr; Back to Dashboard</a>
+    </div>
+
+    <script>
+        // Wallet balance handle karne ke liye functions
+        function getBalance() {
+            let bal = localStorage.getItem('user_balance');
+            if (bal === null) {
+                bal = 0.00; // Default testing balance agar pehli baar ho
+                localStorage.setItem('user_balance', bal);
+            }
+            return parseFloat(bal);
+        }
+
+        function setBalance(bal) {
+            localStorage.setItem('user_balance', bal);
+        }
+
+        function updateDisplay() {
+            let currentBalance = getBalance();
+            document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
+        }
+
+        function handleWithdrawal(event) {
+            event.preventDefault();
+            let amount = parseFloat(document.getElementById('withdrawAmount').value);
+            let upi = document.getElementById('upiId').value.trim();
+            let currentBalance = getBalance();
+
+            // 1. Min / Max Validation (₹110 to ₹50,000)
+            if (amount < 110 || amount > 50000) {
+                alert("Minimum withdrawal is ₹110 and Maximum is ₹50,000!");
+                return;
+            }
+
+            // 2. Balance Validation
+            if (amount > currentBalance) {
+                alert("Insufficient balance! You cannot withdraw more than your available balance.");
+                return;
+            }
+
+            // 3. Subtract Amount instantly on submission
+            let newBalance = currentBalance - amount;
+            setBalance(newBalance);
+            updateDisplay();
+
+            // 4. Send Request to Admin Panel list (Stored in localStorage so Admin panel can read/approve/reject it)
+            let requests = JSON.parse(localStorage.getItem('admin_withdraw_requests') || '[]');
+            let newRequest = {
+                id: Date.now(),
+                username: localStorage.getItem('current_user') || 'Danish',
+                amount: amount,
+                upi: upi,
+                status: 'Pending'
+            };
+            requests.push(newRequest);
+            localStorage.setItem('admin_withdraw_requests', JSON.stringify(requests));
+
+            alert(`Withdrawal request of ₹${amount} submitted successfully!\nAmount has been deducted from your balance. Sent to Admin Panel for approval.`);
+            
+            // Redirect back to dashboard
+            window.location.href = '/dashboard';
+        }
+
+        // Initial load par balance dikhao
+        updateDisplay();
+    </script>
+</body>
+</html>
